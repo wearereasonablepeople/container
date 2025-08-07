@@ -1,10 +1,10 @@
 {
     "name": "@echtejosh/container",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "A lightweight container for dependencies and services.",
     "license": "MIT",
     "author": "Joshua Agripo",
-    "type": "commonjs",
+    "type": "module",
     "main": "dist/container.js",
     "types": "dist/container.d.ts",
     "keywords": [
