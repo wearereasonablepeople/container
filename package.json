@@ -1,0 +1,29 @@
+{
+    "name": "@echtejosh/container",
+    "version": "1.0.0",
+    "description": "A lightweight container for dependencies and services.",
+    "license": "MIT",
+    "author": "Joshua Agripo",
+    "type": "commonjs",
+    "main": "dist/container.js",
+    "types": "dist/container.d.ts",
+    "keywords": [
+        "typescript",
+        "dependency-injection",
+        "container",
+        "di",
+        "lightweight",
+        "services"
+    ],
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "publish:public": "npm publish --access public",
+        "build": "tsc"
+    },
+    "files": [
+        "dist"
+    ],
+    "devDependencies": {
+        "typescript": "^5.9.2"
+    }
+}
