@@ -18,7 +18,7 @@ yarn add @echtejosh/container
 
 ### Resolve
 
-The `app` function registers an instance of class or function, and persists their state across the entire application.
+The `app` function registers an instance of class or function, and persists it across the entire application.
 
 > [!NOTE]
 > Using `app` again with the same reference, whether a class or a function, returns the first registered instance.
@@ -36,7 +36,7 @@ class CounterService {
 
 const counter = app(CounterService);
 
-counter.up()
+counter.up();
 ```
 
 #### Functions
@@ -57,34 +57,17 @@ function counterService() {
 
 const counter = app(counterService);
 
-counter.up()
+counter.up();
 ```
 
-### Memo
+### Register
 
-Variable `b` retrieves the data earlier because `a` has computed it previously.
-  
-> [!NOTE]
-> The `memo` method only caches by the arguments you pass, make sure to only use pure functions.
-
-```ts
-function fib(n: number): number {
-  return n < 2 ? n : fib(n - 1) + fib(n - 2);
-}
-
-const fibonacci = Container.memo(fib);
-
-const a = fibonacci(10)
-const b = fibonacci(10)
-```
-
-### Patterns
-
-Create patterns for services and dependencies.
+The `register` method creates a persistent instance to be stored in the container.
 
 > [!NOTE]
-> The container does not inspect constructor parameters. Instead, it provides functions that you can use to use your own patterns:
+> You can register a class by it's reference and create variable instances with it's interface based on the reference.
 
+#### Variable instance
 ```ts
 const production = false;
 
@@ -96,6 +79,47 @@ class User {
   }
 }
 
-Container.register(User, () => new User(production ? 1 : 2))
+Container.register(User, () => new User(production ? 1 : 2));
 
+```
+
+#### Abstraction binding
+```ts
+class DatabaseClient {
+  private url: string;
+
+  constructor(url: string) {
+    this.url = url;
+  }
+}
+
+class PostgresClient extends DatabaseClient {
+  constructor(url: string) {
+    super(url);
+  }
+}
+
+Container.register(DatabaseClient, () => {
+  const config = app(ConfigService);
+
+  return new PostgresClient(config.getDatabaseUrl());
+});
+```
+
+### Memo
+
+Variable `b` retrieves the data earlier because `a` has computed it previously.
+  
+> [!NOTE]
+> The `memo` method only caches by the arguments you pass, make sure to only use pure functions.
+
+```ts
+function fib(n: number): number { 
+  return n < 2 ? n : fib(n - 1) + fib(n - 2);
+}
+
+const fibonacci = Container.memo(fib);
+
+const a = fibonacci(10);
+const b = fibonacci(10);
 ```
