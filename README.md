@@ -64,10 +64,10 @@ counter.up();
 
 The `register` method creates a persistent instance to be stored in the container.
 
+#### Variable instance
 > [!NOTE]
 > You can register a class by it's reference and create variable instances with it's interface based on the reference.
 
-#### Variable instance
 ```ts
 const production = false;
 
