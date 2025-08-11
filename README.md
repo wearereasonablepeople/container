@@ -110,7 +110,7 @@ Container.register(DatabaseClient, () => {
 
 Variable `b` retrieves the data earlier because `a` has computed it previously.
   
-> [!NOTE]
+> [!IMPORTANT]
 > The `memo` method only caches by the arguments you pass, make sure to only use pure functions.
 
 ```ts
