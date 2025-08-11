@@ -68,14 +68,14 @@ Variable `b` retrieves the data earlier because `a` has computed it previously.
 > The `memo` method only caches by the arguments you pass, make sure to only use pure functions.
 
 ```ts
-function fibonacci(n: number): number {
+function fib(n: number): number {
   return n < 2 ? n : fib(n - 1) + fib(n - 2);
 }
 
-const fib = Container.memo(fib);
+const fibonacci = Container.memo(fib);
 
-const a = fib(10)
-const b = fib(10)
+const a = fibonacci(10)
+const b = fibonacci(10)
 ```
 
 ### Patterns
