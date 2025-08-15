@@ -1,6 +1,6 @@
 # Container
 
-A simple container for resolving dependencies that supports classes and functions.
+A service container for resolving dependencies that supports classes and functions.
 
 ## Getting Started
 
