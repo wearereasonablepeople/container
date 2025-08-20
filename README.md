@@ -1,4 +1,4 @@
-# Container
+# container
 
 A service container for resolving dependencies that supports classes and functions.
 
