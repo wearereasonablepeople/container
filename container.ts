@@ -29,6 +29,13 @@ export abstract class Container {
     private static readonly instances = new WeakMap<Injectable<unknown>, unknown>();
 
     /**
+     * Registered instances.
+     *
+     * @private
+     */
+    private static readonly providers = new WeakMap<Injectable<unknown>, () => unknown>();
+
+    /**
      * Memoized function caches.
      *
      * @private
@@ -61,6 +68,7 @@ export abstract class Container {
         factory?: Injectable<T>,
     ) {
         this.instances.set(service, this.serve(factory ?? service));
+        this.providers.set(service, () => this.serve(factory ?? service));
     }
 
     /**
@@ -69,11 +77,20 @@ export abstract class Container {
      * When the service is not found, it will be registered into the container and returned.
      *
      * @param service
-     * @see Container.register
+     * @param fresh
+     * @see Container.registerx
      */
-    static resolve<T>(service: Injectable<T>) {
-        if (!this.instances.has(service)) {
+    static resolve<T>(service: Injectable<T>, fresh: boolean = false) {
+        if (!this.providers.has(service)) {
             this.register(service);
+        }
+
+        if (fresh) {
+            return this.providers.get(service)!() as T;
+        }
+
+        if (!this.instances.has(service)) {
+            this.instances.set(service, this.providers.get(service)!());
         }
 
         return this.instances.get(service) as T;
@@ -118,6 +135,7 @@ export abstract class Container {
      */
     static unregister<T>(service: Injectable<T>) {
         this.instances.delete(service);
+        this.providers.delete(service);
     }
 
     /**
@@ -146,8 +164,9 @@ export abstract class Container {
  * This function will register the service into the container if it is not already registered.
  *
  * @param service
+ * @param fresh
  * @see Container.resolve
  */
-export function app<T>(service: Injectable<T>) {
-    return Container.resolve(service);
+export function app<T>(service: Injectable<T>, fresh: boolean = false) {
+    return Container.resolve(service, fresh);
 }
