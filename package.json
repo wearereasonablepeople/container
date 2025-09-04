@@ -1,6 +1,6 @@
 {
     "name": "@echtejosh/container",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "description": "A lightweight container for dependencies and services.",
     "license": "MIT",
     "author": "Joshua Agripo",
