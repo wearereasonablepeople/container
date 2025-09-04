@@ -22,18 +22,18 @@ export type Injectable<T> = Factory<T> | ClassConstructor<T>;
  */
 export abstract class Container {
     /**
-     * Registered instances (singletons).
+     * Registered instances.
      *
      * @private
      */
     private static readonly instances = new WeakMap<Injectable<unknown>, unknown>();
 
     /**
-     * Registered providers (factory or class used to create instances).
+     * Registered instances.
      *
      * @private
      */
-    private static readonly providers = new WeakMap<Injectable<unknown>, Injectable<unknown>>();
+    private static readonly providers = new WeakMap<Injectable<unknown>, () => unknown>();
 
     /**
      * Memoized function caches.
@@ -43,34 +43,32 @@ export abstract class Container {
     private static readonly memos = new WeakMap<(...args: any[]) => any, Map<string, unknown>>();
 
     /**
-     * Get an instance of a service from a provider.
+     * Get an instance of a service.
      *
-     * @param provider
+     * @param service
      * @private
      */
-    private static serve<T>(provider: Injectable<T>) {
-        if (this.supports(provider)) {
-            return new (provider as ClassConstructor<T>)();
+    private static serve<T>(service: Injectable<T>) {
+        if (this.supports(service)) {
+            return new (service as ClassConstructor<T>)();
         }
 
-        return (provider as Factory<T>)();
+        return (service as Factory<T>)();
     }
 
     /**
      * Register a service.
      *
-     * @param service  The service token (used to look up in the container)
-     * @param factory  Optional factory/class to construct the service. Defaults to `service`.
+     * @param service
+     * @param factory
      * @see Container.serve
      */
     static register<T>(
         service: Injectable<T>,
         factory?: Injectable<T>,
     ) {
-        const provider = (factory ?? service) as Injectable<T>;
-
-        this.providers.set(service, provider);
-        this.instances.set(service, this.serve(provider));
+        this.instances.set(service, this.serve(factory ?? service));
+        this.providers.set(service, () => this.serve(factory ?? service));
     }
 
     /**
@@ -78,26 +76,21 @@ export abstract class Container {
      *
      * When the service is not found, it will be registered into the container and returned.
      *
-     * @param service The service token
-     * @param fresh   If true, bypass the singleton cache and create a new instance each time.
-     *                Default is false (singleton).
-     * @see Container.register
+     * @param service
+     * @param fresh
+     * @see Container.registerx
      */
-    static resolve<T>(service: Injectable<T>, fresh: boolean = false): T {
+    static resolve<T>(service: Injectable<T>, fresh: boolean = false) {
         if (!this.providers.has(service)) {
             this.register(service);
         }
 
         if (fresh) {
-            const provider = (this.providers.get(service) as Injectable<T>) ?? service;
-
-            return this.serve(provider);
+            return this.providers.get(service)!() as T;
         }
 
         if (!this.instances.has(service)) {
-            const provider = (this.providers.get(service) as Injectable<T>) ?? service;
-
-            this.instances.set(service, this.serve(provider));
+            this.instances.set(service, this.providers.get(service)!());
         }
 
         return this.instances.get(service) as T;
@@ -136,17 +129,13 @@ export abstract class Container {
     }
 
     /**
-     * Unregister a service instance (keeps the provider).
+     * Unregister a service.
      *
      * @param service
-     * @param provider
      */
-    static unregister<T>(service: Injectable<T>, provider: boolean) {
+    static unregister<T>(service: Injectable<T>) {
         this.instances.delete(service);
-
-        if (provider) {
-            this.providers.delete(service);
-        }
+        this.providers.delete(service);
     }
 
     /**
@@ -175,7 +164,7 @@ export abstract class Container {
  * This function will register the service into the container if it is not already registered.
  *
  * @param service
- * @param fresh If true, bypass singleton and create a new instance each call.
+ * @param fresh
  * @see Container.resolve
  */
 export function app<T>(service: Injectable<T>, fresh: boolean = false) {
