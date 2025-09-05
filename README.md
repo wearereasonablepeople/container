@@ -6,12 +6,12 @@ A service container for resolving dependencies that supports classes and functio
 
 Using `npm`
 ```sh
-npm install @echtejosh/container
+npm install @warp-org/container
 ```
 
 Or using `yarn`
 ```sh
-yarn add @echtejosh/container
+yarn add @warp-org/container
 ```
 
 ## Usage
@@ -106,6 +106,23 @@ Container.register(DatabaseClient, () => {
 });
 ```
 
+### Transience
+
+Registrations can also be resolved as transient. In this example, both temporary storage methods are resolved but are not related to each other as singletons.
+
+```ts
+const userStore = Container.resolve(TemporaryStorage, true);
+const productStore = Container.resolve(TemporaryStorage, true);
+
+const users = userStore.getAll();
+
+const products = productStore.where({
+    lower: {
+        price: 200
+    }
+});
+```
+
 ### Memo
 
 Variable `b` retrieves the data earlier because `a` has computed it previously.
@@ -123,3 +140,4 @@ const fibonacci = Container.memo(fib);
 const a = fibonacci(10);
 const b = fibonacci(10);
 ```
+
